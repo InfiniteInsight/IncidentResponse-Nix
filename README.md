@@ -18,8 +18,8 @@ Pipe any commandline ouput to make-log to capture it in a timestamped log.
 
 ## collect-InitialData function
 This function is automtically called after giving the incident a name. It collects the following items:
-    - Hostname
-    - Bash History of your current logged in user
+    -Hostname
+    -Bash History of your current logged in user
     - Bash history of all other local users
     - Copy of auth.log
     - Currently connected users and sessions
