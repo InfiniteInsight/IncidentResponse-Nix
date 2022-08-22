@@ -19,6 +19,17 @@ function collect-InitialData() {
     echo -e "\n================================================================ {Beginning of entry for Initial Observables: $(date)} \n" >> $incidentName-Initial-Observables.txt
     echo "Command history for logged in user has been output to $datapath/$incidentName-initialHistory.txt" >> $logPath
     history >> $dataPath/$incidentName-initialHistory.txt
+    echo "Making a copy of auth.log" >> $logPath
+    cp /var/log/auth.log $dataPath/auth.log
+    cp /var/log/secure $dataPath/secure
+    mkdir $dataPath/bash_history
+    echo "Copying each user's bash history to $dataPath/bash_history"
+    users=$(ls /home/)
+        for user in "${users[@]}";
+            do
+                cp /$user/.bash_history $dataPath/bash_history/$user-bash_history
+            done
+
     echo "Hostname is: " $(hostname) >> $logPath
     echo -e "Current logged in users are:\n""$(who)" >> $logPath
     echo -e "Current uptime of the device is:\n""$(uptime)" >> $logPath
@@ -26,6 +37,8 @@ function collect-InitialData() {
     echo -e "ARP entries are:\n""$(arp)" >>  $logPath
     echo -e "IP Route List table is currently:\n""$(ip route list)" >> $logPath
     echo -e "Current Interface configuration:\n""$(ifconfig)" >> $logPath
+    echo "Current network connections have been output to $datapath/$incidentName-netstat.txt" >> $logPath
+    netstat -anp >> $datapath/$incidentName-netstat.txt
     echo "Running processes have been output to $datapath/$incidentName-initialObservedProcesses.txt" >> $logPath
     ps aux >> $dataPath/$incidentName-initialObservedProcesses.txt
     echo "Listing of open files have been output to $datapath/$incidentName-initialListingOpenFiles.txt" >> $logPath
