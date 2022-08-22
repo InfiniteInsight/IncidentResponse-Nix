@@ -12,8 +12,11 @@ Pipe any commandline ouput to make-log to capture it in a timestamped log.
 Examples:  
 
 `$ ps -e | make-log`
+
 `$ cat /etc/hosts | make-log`
+
 `$ ls /tmp/ | make-log`
+
 `$ strace -p 1234 | make-log`
                 
 
