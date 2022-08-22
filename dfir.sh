@@ -17,26 +17,29 @@ mkdir $dataPath
 function collect-InitialData() {
     logPath="$dataPath/$incidentName-Initial-Observables.txt"
     echo -e "\n================================================================ {Beginning of entry for Initial Observables: $(date)} \n" >> $incidentName-Initial-Observables.txt
-    echo "Command history for logged in user has been output to $datapath/$incidentName-initialHistory.txt" >> $logPath
+    echo "Command history for logged in user has been output to $dataPath/$incidentName-initialHistory.txt" >> $logPath
     history >> $dataPath/$incidentName-initialHistory.txt
     echo "Making a copy of auth.log" >> $logPath
-    cp /var/log/auth.log $dataPath/auth.log
+
+    cp /var/log/auth.log $dataPath/auth.log #To Do: Add a check to see if the OS is Debian or Fedora so that it copies the right auth.log/secure file
     cp /var/log/secure $dataPath/secure
-    mkdir $dataPath/bash_history
-    echo "Copying each user's bash history to $dataPath/bash_history"
-    users=$(ls /home/)
-        for user in "${users[@]}";
-            do
-                cp /$user/.bash_history $dataPath/bash_history/$user-bash_history
-            done
+   
+
+    find /home/*/.bash_history >> $dataPath/$incidentName-found_bash_history_files #find all bash history files and output filepaths to a file
+    bashHistory=$dataPath/$incidentName-found_bash_history_files #assign a variable to the found bash history files 
+
+    while read bashHistoryPath; do #loop through each bash history file and append it to a file for easier searching
+            echo -e "$bashHistoryPath" >> /root/temptest/cat_bash_history
+            cat $bashHistoryPath >> $dataPath/$incidentName-concatenated_bash_history
+    done < "$bashHistory"
 
     echo "Hostname is: " $(hostname) >> $logPath
     echo -e "Current logged in users are:\n""$(who)" >> $logPath
     echo -e "Current uptime of the device is:\n""$(uptime)" >> $logPath
     echo -e "Current distribution of the OS is:\n""$(uname -a)" >> $logPath
-    echo -e "ARP entries are:\n""$(arp)" >>  $logPath
+    echo -e "ARP entries are:\n""$(arp -a)" >>  $logPath
     echo -e "IP Route List table is currently:\n""$(ip route list)" >> $logPath
-    echo -e "Current Interface configuration:\n""$(ifconfig)" >> $logPath
+    echo -e "Current Interface configuration:\n""$(ifconfig -a)" >> $logPath
     echo "Current network connections have been output to $datapath/$incidentName-netstat.txt" >> $logPath
     netstat -anp >> $datapath/$incidentName-netstat.txt
     echo "Running processes have been output to $datapath/$incidentName-initialObservedProcesses.txt" >> $logPath
@@ -80,5 +83,13 @@ function get-FileHash() {
     sha256sums=$(sha256sum *)
     echo -e "MD5 Hash of all files in current directory" $(pwd) "$md5sums" | make-log
     echo -e "SHA-256 Hash of all files in current directory" $(pwd) "$sha256sums" | make-log
-
 }
+
+
+#To Do:
+## function to acquire AVML and take a capture
+## function to acquire chrootkit
+## function to acquire AIDE
+## check ip links for promiscuous mode
+## if RPM is installed verify packages rpm -Va | sort
+## 
